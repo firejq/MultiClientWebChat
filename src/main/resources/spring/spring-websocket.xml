@@ -10,7 +10,7 @@
 
     <websocket:handlers allowed-origins="*">
         <websocket:mapping path="/messageHandler" handler="messageHandler"/>
-        <websocket:mapping path="/heartbeatHandler" handler="heartbeatHandler"/>
+        <!--<websocket:mapping path="/heartbeatHandler" handler="heartbeatHandler"/>-->
         <websocket:handshake-interceptors>
             <bean class="com.firejq.websocket.handshake.WebsocketHandshake"/>
         </websocket:handshake-interceptors>
@@ -25,6 +25,6 @@
 
 
     <bean id="messageHandler" class="com.firejq.websocket.handler.MessageHandler"></bean>
-    <bean id="heartbeatHandler" class="com.firejq.websocket.handler.HeartbeatHandler"></bean>
+    <!--<bean id="heartbeatHandler" class="com.firejq.websocket.handler.HeartbeatHandler"></bean>-->
 
 </beans>
