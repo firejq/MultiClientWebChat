@@ -13,7 +13,9 @@
     - 若 client  - server 通信发生中断，触发客户端onclose event，主动重连
 - [ ] Two-way heartbeat detection
     - 若 client  - server 通信发生中断但无法触发客户端onclose event，客户端无法获知中断情况
-    - 使用应用层的双边心跳检测
+    - 使用应用层的双边心跳检测，使 client / server 得知中断情况
+    - 客户端每隔n秒发送一个心跳包，若服务器响应时间超时，则说明连接中断；
+    - 服务器每隔n秒检测任务队列是否空闲，若空闲，加入一个发送心跳包到每个客户端的任务，计算响应时间；
 - [ ] MessageQueue broke
     - 使用专用消息队列作为消息中间层
 

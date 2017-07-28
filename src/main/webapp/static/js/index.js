@@ -46,17 +46,18 @@ window.onload = function () {
 
         };
 
-        websocket.onclose = function (event) {
-            document.getElementById('chat').onkeydown = null;
-            document.getElementById("state-info").innerHTML = "连接关闭，10秒后重新连接……";
-            console.log("Disconnected from WebSocket server. It will reconnect after 10 seconds...");
-
-            // 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
-            setTimeout(function () {
-                connect(url);
-            }, 10000);
-
-        };
+        //TODO
+        // websocket.onclose = function (event) {
+        //     document.getElementById('chat').onkeydown = null;
+        //     document.getElementById("state-info").innerHTML = "连接关闭，10秒后重新连接……";
+        //     console.log("Disconnected from WebSocket server. It will reconnect after 10 seconds...");
+        //
+        //     // 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
+        //     setTimeout(function () {
+        //         connect(url);
+        //     }, 10000);
+        //
+        // };
 
         websocket.onmessage = function(message) {
             // heartCheck.reset();
@@ -66,40 +67,18 @@ window.onload = function () {
 
         };
 
-        websocket.onerror = function (event) {
-            document.getElementById("state-info").innerHTML = "连接出错";
-            console.log('Error occured: ' + event.data);
-
-        };
+        //TODO
+        // websocket.onerror = function (event) {
+        //     document.getElementById("state-info").innerHTML = "连接出错";
+        //     console.log('Error occured: ' + event.data);
+        //
+        // };
 
         //监听窗口关闭事件，窗口关闭前，主动关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常
         window.onbeforeunload = function () {
             websocket.close();
         }
     };
-
-    /**
-     * 心跳检测工具类
-     * @type {{timeout: number, timeoutObj: null, reset: reset, start: start}}
-     */
-    // var heartCheck = {
-    //     timeout: 10000,//20s
-    //     timeoutObj: null,
-    //     reset: function() {
-    //         clearTimeout(this.timeoutObj);
-    //         this.start();
-    //     },
-    //     start: function(heartbeatws) {
-    //
-    //         this.timeoutObj = setTimeout(function() {
-    //             heartbeatws.send("HeartBeat");
-    //             console.log("已发送一个HeartBeat");
-    //
-    //             //if 没收到回应 就是连接已中断，检测传输的连接的readystate，根据状态做出选择，如重连/关闭
-    //
-    //         }, this.timeout);
-    //     }
-    // };
 
     /**
      * 信息输出容器output

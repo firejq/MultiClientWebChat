@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class MessageHandler implements WebSocketHandler {
 
 		webSocketSession.sendMessage(new TextMessage("你与服务器连接成功了！你的sessionID为【" + webSocketSession.getId() + "】"));
 
-		StringBuffer sessionIds = new StringBuffer("");
+		StringBuilder sessionIds = new StringBuilder("");
 		for (WebSocketSession session : sessions) {
 			session.sendMessage(new TextMessage("用户" + webSocketSession.getId() + "已加入聊天室"));
 			sessionIds.append(" " + session.getId() + " ");
@@ -45,13 +46,9 @@ public class MessageHandler implements WebSocketHandler {
 	public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
 		//		Record record = new Gson().fromJson(webSocketMessage.getPayload().toString(), Record.class);
 
-		TextMessage returnMessage = new TextMessage("用户" + webSocketSession.getId() + "说: "
-				+ webSocketMessage.getPayload());
 		System.out.println("服务器收到来自sessionId【" + webSocketSession.getId() + "】信息：" + webSocketMessage.getPayload());
 
-		for (WebSocketSession session : sessions) {
-			session.sendMessage(returnMessage);//TODO IllegalStateException
-		}
+		this.sendToAll("用户" + webSocketSession.getId() + "说: " + webSocketMessage.getPayload());
 
 
 	}
@@ -68,13 +65,12 @@ public class MessageHandler implements WebSocketHandler {
 		System.out.println("连接关闭！");
 		System.out.println("WebsocketSessionId为【" + webSocketSession.getId() + "】的连接已经关闭, reason:【" + closeStatus
 				.getReason() + "】, code:【" + closeStatus.getCode() + "】");
+		//将该连接从session队列中移除
 		sessions.remove(webSocketSession);
 		System.out.println("已将WebsocketSessionId为【" + webSocketSession.getId() + "】的连接从连接队列中移除！");
 
-		if (!sessions.isEmpty()) {//TODO 如果session池不为空 广播：用户xx已退出chat
-			for (WebSocketSession session : sessions) {
-				session.sendMessage(new TextMessage("用户" + webSocketSession.getId() + "已退出聊天室。"));
-			}
+		if (!sessions.isEmpty()) {
+			this.sendToAll("用户" + webSocketSession.getId() + "已退出聊天室。");
 		} else {
 			System.out.println("当前连接客户端数量为0！");
 		}
@@ -84,4 +80,18 @@ public class MessageHandler implements WebSocketHandler {
 	public boolean supportsPartialMessages() {
 		return false;
 	}
+
+
+	/**
+	 * 广播给所有客户端
+	 * @param messaage
+	 */
+	private void sendToAll(String messaage) throws Exception {
+		for (WebSocketSession session : sessions) {
+			session.sendMessage(new TextMessage("" + messaage));
+		}
+	}
+
+
+
 }
