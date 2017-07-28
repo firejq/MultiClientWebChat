@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <context:component-scan base-package="com.firejq.web"/>
+
+    <mvc:annotation-driven/>
+    <context:annotation-config/>
+
+    <!-- 静态资源处理， css， js， imgs -->
+    <mvc:resources location="/static/" mapping="/static/**" cache-period="3000"  order="0">
+        <!--缓存设置为 3000 秒-->
+        <mvc:resource-chain resource-cache="true">
+            <mvc:resolvers>
+                <bean class="org.springframework.web.servlet.resource.GzipResourceResolver"/>
+            </mvc:resolvers>
+        </mvc:resource-chain>
+    </mvc:resources>
+    <mvc:default-servlet-handler default-servlet-name="default"/>
+
+
+
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <!--<property name="prefix" value="/WEB-INF/page/"/>-->
+        <!--<property name="suffix" value=".jsp"/>-->
+    </bean>
+
+
+</beans>

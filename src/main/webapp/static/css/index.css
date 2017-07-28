@@ -1,0 +1,22 @@
+input#chat {
+    width: 510px
+}
+
+#output-container {
+    width: 500px;
+}
+
+#output {
+    border: 1px solid #CCCCCC;
+    border-right-color: #999999;
+    border-bottom-color: #999999;
+    height: 300px;
+    overflow-y: scroll;
+    padding: 5px;
+    width: 100%;
+}
+
+#output p {
+    padding: 0;
+    margin: 0;
+}
