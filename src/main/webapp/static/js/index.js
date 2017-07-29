@@ -137,7 +137,7 @@ window.onload = function () {
          * @type {{timeout: number, timeoutObj: null, serverTimeoutObj: null, reset: reset, start: start}}
          */
         var heartCheck = {
-            timeout: 10000, //计时器设定为40s
+            timeout: 20000, //计时器设定为20s
             timeoutObj: null,
             serverTimeoutObj: null,
             reset: function() {
