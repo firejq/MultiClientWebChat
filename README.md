@@ -1,7 +1,7 @@
 ## MultiClientWebChat
 &nbsp;&nbsp;&nbsp;&nbsp;基于 [Spring Websocket][1] 的多人网页聊天室
 
-&nbsp;&nbsp;&nbsp;&nbsp;Only for practice the unfamiliar technology
+&nbsp;&nbsp;&nbsp;&nbsp;Only for practice
 
 [1]:https://docs.spring.io/spring/docs/current/spring-framework-reference/html/websocket.html "sad"
 ### Feature and Achieve

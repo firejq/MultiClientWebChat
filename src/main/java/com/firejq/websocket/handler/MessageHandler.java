@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +22,16 @@ public class MessageHandler implements WebSocketHandler {
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
+
+		byte[] bs = new byte[1];
+		bs[0] = 'i';//TODO Why is 'i' ?
+		ByteBuffer byteBuffer = ByteBuffer.wrap(bs);
+		PingMessage pingMessage = new PingMessage(byteBuffer);
+		webSocketSession.sendMessage(pingMessage);
+		System.out.println("已发送一个ping包：【" + pingMessage.toString() + "】");
+
+
+
 		//加入连接队列
 		sessions.add(webSocketSession);
 		//		System.out.println(webSocketSession);
@@ -46,9 +58,18 @@ public class MessageHandler implements WebSocketHandler {
 	public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
 		//		Record record = new Gson().fromJson(webSocketMessage.getPayload().toString(), Record.class);
 
-		System.out.println("服务器收到来自sessionId【" + webSocketSession.getId() + "】信息：" + webSocketMessage.getPayload());
+		Object payload = webSocketMessage.getPayload();
 
-		this.sendToAll("用户" + webSocketSession.getId() + "说: " + webSocketMessage.getPayload());
+		if (payload instanceof ByteBuffer) {
+			System.out.println("服务器收到来自sessionId【" + webSocketSession.getId() + "】的ping答复：【" + payload + "】");
+		}
+
+		if (payload instanceof String) {
+			System.out.println("服务器收到来自sessionId【" + webSocketSession.getId() + "】的信息：【" + payload + "】");
+
+			this.sendToAll("用户" + webSocketSession.getId() + "说: 【" + payload + "】");
+		}
+
 
 
 	}
@@ -62,8 +83,8 @@ public class MessageHandler implements WebSocketHandler {
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) throws Exception {
-		System.out.println("连接关闭！");
-		System.out.println("WebsocketSessionId为【" + webSocketSession.getId() + "】的连接已经关闭, reason:【" + closeStatus
+
+		System.out.println("WebsocketSessionId为【" + webSocketSession.getId() + "】的连接关闭, reason:【" + closeStatus
 				.getReason() + "】, code:【" + closeStatus.getCode() + "】");
 		//将该连接从session队列中移除
 		sessions.remove(webSocketSession);
