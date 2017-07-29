@@ -1,5 +1,5 @@
 # MultiClientWebChat
-基于 [Spring Websocket][1] 和客户端心跳保活重连机制的多人网页聊天室
+基于 [Spring Websocket][1] 和心跳保活重连的多人网页聊天室
 
 > Only for practice
 
