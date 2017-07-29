@@ -9,7 +9,7 @@
 ### Schedule
 - [x] Multiple client chat
 - [x] Client reconnecting mechanism
-- [ ] Client keep alive and reconnect using heartbeat
+- [x] Client keep alive and reconnect using heartbeat
 - [ ] MessageQueue broke
 
 ### Multiple client chat
