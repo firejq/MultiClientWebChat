@@ -1,19 +1,15 @@
-<style>
-p{
-	text-indent: 2em; /*首行缩进*/
-}
-</style>
 # MultiClientWebChat
 基于 [Spring Websocket][1] 的多人网页聊天室
 
-Only for practice
+> Only for practice
 
-[1]:https://docs.spring.io/spring/docs/current/spring-framework-reference/html/websocket.html "sad"
+[1]:https://docs.spring.io/spring/docs/current/spring-framework-reference/html/websocket.html "Spring Websocket"
 ## Feature and Achieve
 
+### Schedule
 - [x] Multiple client chat
 - [x] Client reconnecting mechanism
-- [x] Client keep alive and reconnect using heartbeat
+- [ ] Client keep alive and reconnect using heartbeat
 - [ ] MessageQueue broke
 
 ### Multiple client chat
@@ -40,19 +36,3 @@ Only for practice
 
 ### MessageQueue broke
 - 使用专用消息队列作为消息中间层
-
-~~
-### 服务器踢除“死链接”机制
-
-服务器另开一个线程运行以下逻辑：  
-- 设置计时器，计时器超时则检测session池是否为空：
-    - 若为空，将计时器归零后重新启动   
-    - 若不为空，则进行下一步   
-- 检测任务队列是否空闲： 
-    - 若不空闲，将session池中没任务的连接提取到另一个session集合newSessions中，若newSessions为空，则将计时器归零后重新启动
-    - 若空闲，将所有session加入到newSessions中   
-- 发送心跳包到newSessions的每个客户端，检测回复：
-    - 有回复的session连接，将其全部放回session池
-    - 没有回复的session连接，将其连接关闭   
-- 计时器归零后重新启动
-~~
