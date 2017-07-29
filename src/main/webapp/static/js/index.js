@@ -6,7 +6,15 @@ window.onload = function () {
 
 
     document.getElementById("state-info").innerHTML = "正在准备连接服务器……";
+
+    //当前已重连次数，超过上限则不再重连，彻底关闭连接
+    var curTryNum = 0;
+    var maxTryNum = 10;
+
     var connect = function (url) {
+        //连接次数加一
+        curTryNum = curTryNum + 1;
+
         var websocket = null;
 
         if (window.WebSocket && window.WebSocket.prototype.send) {
@@ -20,6 +28,9 @@ window.onload = function () {
         }
 
         websocket.onopen = function (event) {
+            //连接成功时将当前已重连次数归零
+            curTryNum = 0;
+
             document.getElementById("state-info").innerHTML = "连接成功";
             console.log("Connected to WebSocket server.");
 
@@ -47,22 +58,28 @@ window.onload = function () {
 
         };
 
-        //TODO
-        // websocket.onclose = function (event) {
-        //     document.getElementById('chat').onkeydown = null;
-        //     document.getElementById("state-info").innerHTML = "连接关闭，10秒后重新连接……";
-        //     console.log("Disconnected from WebSocket server. It will reconnect after 10 seconds...");
-        //
-        //     // 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
-        //     setTimeout(function () {
-        //         connect(url);
-        //     }, 10000);
-        //
-        // };
+        websocket.onclose = function (event) {
+            document.getElementById('chat').onkeydown = null;
+
+            if (curTryNum <= maxTryNum) {
+                document.getElementById("state-info").innerHTML = "连接关闭，10秒后重新连接……";
+                console.log("Disconnected from WebSocket server. It will reconnect after 10 seconds...");
+
+
+                // 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
+                setTimeout(function () {
+                    connect(url);
+                }, 10000);
+            } else {
+                document.getElementById("state-info").innerHTML = "连接关闭，且已超过最大重连次数，不再重连";
+                console.log("Disconnected from WebSocket server. It won't reconnect anymore");
+            }
+
+
+        };
 
         websocket.onmessage = function(message) {
             // 无论收到什么信息，说明当前连接正常，将心跳检测的计时器重置
-            //TODO 客户端主动发ping的话不完善（如果客户端收不到回复，如何处理）
             heartCheck.reset();
 
 
@@ -75,12 +92,11 @@ window.onload = function () {
 
         };
 
-        //TODO
-        // websocket.onerror = function (event) {
-        //     document.getElementById("state-info").innerHTML = "连接出错";
-        //     console.log('Error occured: ' + event.data);
-        //
-        // };
+        websocket.onerror = function (event) {
+            document.getElementById("state-info").innerHTML = "连接出错";
+            console.log('Error occured: ' + event.data);
+
+        };
 
         //监听窗口关闭事件，窗口关闭前，主动关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常
         window.onbeforeunload = function () {
@@ -121,7 +137,7 @@ window.onload = function () {
          * @type {{timeout: number, timeoutObj: null, serverTimeoutObj: null, reset: reset, start: start}}
          */
         var heartCheck = {
-            timeout: 40000, //计时器设定为40s
+            timeout: 10000, //计时器设定为40s
             timeoutObj: null,
             serverTimeoutObj: null,
             reset: function() {
@@ -134,9 +150,10 @@ window.onload = function () {
                 this.timeoutObj = setTimeout(function() {
                     //向服务器发送ping消息
                     pingToServer();
-
-                    self.serverTimeoutObj = setTimeout(function(){
-                        websocket.close();//如果onclose会执行reconnect，我们执行ws.close()就行了.如果直接执行reconnect 会触发onclose导致重连两次
+                    //计算答复的超时时间
+                    self.serverTimeoutObj = setTimeout(function() {
+                        //如果调用onclose会执行reconnect，导致重连两次，因此直接调用close()关闭连接
+                        websocket.close();
                     }, self.timeout);
                 }, this.timeout);
             }

@@ -24,7 +24,7 @@ public class MessageHandler implements WebSocketHandler {
 	public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
 
 		//TODO 完善心跳检测方案 此处只是测试
-		//TODO 客户端主动发ping的话不完善（如果客户端收不到回复，如何处理），服务端主动发ping的还没做
+		//TODO 进度：客户端主动发ping的话不完善（如果客户端收不到回复，如何处理），服务端主动发ping的还没做
 //		this.sendPingMessage(webSocketSession);
 
 		//加入连接队列
@@ -60,7 +60,8 @@ public class MessageHandler implements WebSocketHandler {
 
 			//由于发送pingMessage的话chrome会自动答复，造成死循环，所以得发送TextMessage/binaryMessage作为服务器得pong答复
 			//TODO binaryMessage还未测试
-			webSocketSession.sendMessage(new TextMessage("hb_ok"));
+//			webSocketSession.sendMessage(new TextMessage("hb_ok"));
+//			System.out.println("已答复：【hb_ok】");
 		}
 
 		if (payload instanceof String) {
