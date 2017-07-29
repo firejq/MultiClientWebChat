@@ -23,14 +23,9 @@ public class MessageHandler implements WebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
 
-		byte[] bs = new byte[1];
-		bs[0] = 'i';//TODO Why is 'i' ?
-		ByteBuffer byteBuffer = ByteBuffer.wrap(bs);
-		PingMessage pingMessage = new PingMessage(byteBuffer);
-		webSocketSession.sendMessage(pingMessage);
-		System.out.println("已发送一个ping包：【" + pingMessage.toString() + "】");
-
-
+		//TODO 完善心跳检测方案 此处只是测试
+		//TODO 客户端主动发ping的话不完善（如果客户端收不到回复，如何处理），服务端主动发ping的还没做
+//		this.sendPingMessage(webSocketSession);
 
 		//加入连接队列
 		sessions.add(webSocketSession);
@@ -61,7 +56,11 @@ public class MessageHandler implements WebSocketHandler {
 		Object payload = webSocketMessage.getPayload();
 
 		if (payload instanceof ByteBuffer) {
-			System.out.println("服务器收到来自sessionId【" + webSocketSession.getId() + "】的ping答复：【" + payload + "】");
+			System.out.println("服务器收到来自sessionId【" + webSocketSession.getId() + "】的ping消息：【" + payload + "】");
+
+			//由于发送pingMessage的话chrome会自动答复，造成死循环，所以得发送TextMessage/binaryMessage作为服务器得pong答复
+			//TODO binaryMessage还未测试
+			webSocketSession.sendMessage(new TextMessage("hb_ok"));
 		}
 
 		if (payload instanceof String) {
@@ -103,14 +102,31 @@ public class MessageHandler implements WebSocketHandler {
 	}
 
 
+
+
 	/**
 	 * 广播给所有客户端
 	 * @param messaage
+	 * @throws Exception
 	 */
 	private void sendToAll(String messaage) throws Exception {
 		for (WebSocketSession session : sessions) {
 			session.sendMessage(new TextMessage("" + messaage));
 		}
+	}
+
+	/**
+	 * 向客户端发送一个ping/pong信息
+	 * @param webSocketSession
+	 * @throws Exception
+	 */
+	private void sendPingMessage(WebSocketSession webSocketSession) throws Exception {
+		byte[] bs = new byte[1];
+		bs[0] = 'i';//TODO Why is 'i' ?
+		ByteBuffer byteBuffer = ByteBuffer.wrap(bs);
+		PingMessage pingMessage = new PingMessage(byteBuffer);
+		webSocketSession.sendMessage(pingMessage);
+		System.out.println("已发送一个ping包：【" + pingMessage.toString() + "】");
 	}
 
 

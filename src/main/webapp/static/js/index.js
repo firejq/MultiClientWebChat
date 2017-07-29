@@ -23,11 +23,11 @@ window.onload = function () {
             document.getElementById("state-info").innerHTML = "连接成功";
             console.log("Connected to WebSocket server.");
 
-            // console.log("心跳检测启动");
-            // var heartbeatws = new WebSocket("ws://127.0.0.1:8080/heartbeatHandle");
-            // heartCheck.start(heartbeatws);
 
-            pingToServer();
+            console.log("心跳检测启动");
+            heartCheck.start();
+
+            // pingToServer();
 
 
             document.getElementById("chat").onkeydown = function(KeyboardEvent) {
@@ -48,37 +48,39 @@ window.onload = function () {
         };
 
         //TODO
-        websocket.onclose = function (event) {
-            document.getElementById('chat').onkeydown = null;
-            document.getElementById("state-info").innerHTML = "连接关闭，10秒后重新连接……";
-            console.log("Disconnected from WebSocket server. It will reconnect after 10 seconds...");
-
-            // 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
-            setTimeout(function () {
-                connect(url);
-            }, 10000);
-
-        };
+        // websocket.onclose = function (event) {
+        //     document.getElementById('chat').onkeydown = null;
+        //     document.getElementById("state-info").innerHTML = "连接关闭，10秒后重新连接……";
+        //     console.log("Disconnected from WebSocket server. It will reconnect after 10 seconds...");
+        //
+        //     // 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
+        //     setTimeout(function () {
+        //         connect(url);
+        //     }, 10000);
+        //
+        // };
 
         websocket.onmessage = function(message) {
-            // heartCheck.reset();
-            // obj = JSON.parse(message.data);
+            // 无论收到什么信息，说明当前连接正常，将心跳检测的计时器重置
+            //TODO 客户端主动发ping的话不完善（如果客户端收不到回复，如何处理）
+            heartCheck.reset();
 
 
-            console.log("client received a message: " + message);
             console.log("client received a message.data: " + message.data);
-            console.log("client received the message.type: " + message.type);
-            console.log("client received the message.typeof: " + typeof message.data);
-            output.log(message.data);
+            if (message.data !== "hb_ok") {
+                // 不要将ping的答复信息输出
+                output.log(message.data);
+            }
+
 
         };
 
         //TODO
-        websocket.onerror = function (event) {
-            document.getElementById("state-info").innerHTML = "连接出错";
-            console.log('Error occured: ' + event.data);
-
-        };
+        // websocket.onerror = function (event) {
+        //     document.getElementById("state-info").innerHTML = "连接出错";
+        //     console.log('Error occured: ' + event.data);
+        //
+        // };
 
         //监听窗口关闭事件，窗口关闭前，主动关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常
         window.onbeforeunload = function () {
@@ -105,15 +107,45 @@ window.onload = function () {
             var payload = 'i';
             var buffer = new ArrayBuffer(payload.length);
             var intView = new Int8Array(buffer);
-            for(var i = 0; i < intView.length; i++){
+            for(var i = 0; i < intView.length; i++) {
                 intView[i] = payload.getBytes()[i];
             }
             websocket.send(intView);
-            console.log("客户端已发送一个ping消息：【" + intView.toString() + "】");
+            console.log("客户端已向服务器发送一个ping消息：【" + intView.toString() + "】");
         };
 
 
+        /**
+         * 心跳检测
+         * 若30秒内没有接收到任何来自服务器的信息，则向服务器发起一个ping包
+         * @type {{timeout: number, timeoutObj: null, serverTimeoutObj: null, reset: reset, start: start}}
+         */
+        var heartCheck = {
+            timeout: 40000, //计时器设定为40s
+            timeoutObj: null,
+            serverTimeoutObj: null,
+            reset: function() {
+                clearTimeout(this.timeoutObj);
+                clearTimeout(this.serverTimeoutObj);
+                this.start();
+            },
+            start: function() {
+                var self = this;
+                this.timeoutObj = setTimeout(function() {
+                    //向服务器发送ping消息
+                    pingToServer();
+
+                    self.serverTimeoutObj = setTimeout(function(){
+                        websocket.close();//如果onclose会执行reconnect，我们执行ws.close()就行了.如果直接执行reconnect 会触发onclose导致重连两次
+                    }, self.timeout);
+                }, this.timeout);
+            }
+        };
+
     };
+
+
+
 
     /**
      * 信息输出容器output
@@ -133,24 +165,13 @@ window.onload = function () {
     });
 
 
+    /**
+     * 执行入口
+     * @type {string}
+     */
     var url = "ws://127.0.0.1:8080/messageHandler";
     connect(url);
 
-
-    // var heartbeat = new WebSocket("ws://127.0.0.1:8080/heartbeatHandler");
-    // heartbeat.onopen = function (event) {
-    //     console.log("心跳检测连接成功");
-    // };
-    // heartbeat.onclose = function (event) {
-    //     console.log("心跳检测失去连接");
-    // };
-    // heartbeat.onmessage = function (event) {
-    //     console.log("收到心跳ping信息:" + event.data);
-    //     if( heartbeat.bufferedAmount == 0 ){
-    //         heartbeat.send("我是客户端");
-    //         console.log("已发送一个心跳信息");
-    //     }
-    // };
 
 
 };
