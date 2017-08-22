@@ -1,9 +1,7 @@
 /**
- * Created by firej on 2017/7/25.
+ * Created by firejq on 2017/7/25.
  */
 window.onload = function () {
-
-
 
     document.getElementById("state-info").innerHTML = "正在准备连接服务器……";
 
