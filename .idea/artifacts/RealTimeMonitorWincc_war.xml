@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="RealTimeMonitorWincc:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="RealTimeMonitorWincc.war">
-      <element id="artifact" artifact-name="RealTimeMonitorWincc:war exploded" />
-    </root>
-  </artifact>
-</component>

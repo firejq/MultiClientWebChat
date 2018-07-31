@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="RealTimeMonitor:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="RealTimeMonitor.war">
-      <element id="artifact" artifact-name="RealTimeMonitor:war exploded" />
-    </root>
-  </artifact>
-</component>
