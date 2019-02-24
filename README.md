@@ -32,7 +32,7 @@
 
 客户端设置计时器，每次收到任何信息都将计时器归零，当计时器到时，发送一个心跳包（作用①保活，②检测连接状态），若服务器返回响应，则将计时器归零后重新启动；若服务器响应时间超时（认定为没有响应），则说明连接中断，执行重连逻辑。
 
-<img src="http://otaivnlxc.bkt.clouddn.com/websocket-%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BF%9D%E6%B4%BB+%E9%87%8D%E8%BF%9E%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1.png">
+<img src="http://img.cdn.firejq.com/websocket-%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BF%9D%E6%B4%BB+%E9%87%8D%E8%BF%9E%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1.png">
 
 ### MessageQueue broke
 - 使用专用消息队列作为消息中间层
